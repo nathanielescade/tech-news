@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /js/
+Allow: /components/
+Allow: /images/
+
+Sitemap: https://crazytechnews.com/sitemap.xml
