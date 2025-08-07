@@ -130,11 +130,123 @@ function loadArticleDetail() {
   const urlParams = new URLSearchParams(window.location.search);
   const articleId = urlParams.get('id');
   
-  if (!articleId) {
-    document.getElementById('article-container').innerHTML = 
-      '<div class="p-8 text-center"><h2 class="text-2xl text-red-500">Article not found</h2><p class="mt-4">No article ID was provided.</p></div>';
+  // Check if it's a special ID (like trending1, trending2, etc.)
+  if (articleId && articleId.startsWith('trending')) {
+    loadTrendingArticle(articleId);
     return;
   }
+
+
+  function loadTrendingArticle(articleId) {
+  const trendingArticles = {
+    'trending1': {
+      title: "AI Revolution: ChatGPT-5 Announced",
+      description: "OpenAI announces the next generation of AI with unprecedented capabilities that could transform how we interact with technology. The new model demonstrates remarkable improvements in reasoning, creativity, and accuracy.",
+      urlToImage: "https://storage.googleapis.com/a1aa/image/52207639-38ad-475f-cd53-8e98528d8c4e.jpg",
+      url: "#",
+      source: { name: "AI Today" },
+      publishedAt: new Date().toISOString()
+    },
+    'trending2': {
+      title: "Quantum Computing Breakthrough",
+      description: "Scientists achieve quantum supremacy with new 1000-qubit processor that solves complex problems in seconds that would take traditional computers thousands of years. This breakthrough could revolutionize fields from medicine to cryptography.",
+      urlToImage: "https://storage.googleapis.com/a1aa/image/4955ea93-41fd-406b-39af-605f8eb95418.jpg",
+      url: "#",
+      source: { name: "Quantum Weekly" },
+      publishedAt: new Date().toISOString()
+    },
+    'trending3': {
+      title: "SpaceX Mars Mission Update",
+      description: "Elon Musk reveals new timeline for human colonization of Mars, with planned missions starting as early as 2028. The ambitious plan includes establishing a self-sustaining city on the red planet within the next few decades.",
+      urlToImage: "https://storage.googleapis.com/a1aa/image/fa317592-5bd9-4d59-887c-909df4d8bc96.jpg",
+      url: "#",
+      source: { name: "Space Frontier" },
+      publishedAt: new Date().toISOString()
+    }
+  };
+  
+  const article = trendingArticles[articleId];
+  
+  if (!article) {
+    document.getElementById('article-container').innerHTML = 
+      '<div class="p-8 text-center"><h2 class="text-2xl text-red-500">Article not found</h2><p class="mt-4">The requested article could not be found.</p></div>';
+    return;
+  }
+  
+  // Update SEO meta tags and display article (same as in the original function)
+  document.title = `${article.title} - CRAZY TECH NEWS`;
+  document.getElementById('page-title').textContent = `${article.title} - CRAZY TECH NEWS`;
+  document.getElementById('page-description').setAttribute('content', article.description || 'Read the latest tech news article on CRAZY TECH NEWS.');
+  document.getElementById('canonical-url').setAttribute('href', `https://crazytechnews.com/news-detail.html?id=${articleId}`);
+  
+  // Update Open Graph tags
+  document.getElementById('og-title').setAttribute('content', article.title);
+  document.getElementById('og-description').setAttribute('content', article.description || 'Read the latest tech news article on CRAZY TECH NEWS.');
+  document.getElementById('og-url').setAttribute('href', `https://crazytechnews.com/news-detail.html?id=${articleId}`);
+  document.getElementById('og-image').setAttribute('content', article.urlToImage || 'https://storage.googleapis.com/a1aa/image/8b1cc47c-674c-43d0-869d-86aeee9d1943.jpg');
+  
+  // Update Twitter Card tags
+  document.getElementById('twitter-title').setAttribute('content', article.title);
+  document.getElementById('twitter-description').setAttribute('content', article.description || 'Read the latest tech news article on CRAZY TECH NEWS.');
+  document.getElementById('twitter-image').setAttribute('content', article.urlToImage || 'https://storage.googleapis.com/a1aa/image/8b1cc47c-674c-43d0-869d-86aeee9d1943.jpg');
+  
+  // Update structured data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://crazytechnews.com/news-detail.html?id=${articleId}`
+    },
+    "headline": article.title,
+    "image": [
+      article.urlToImage || 'https://storage.googleapis.com/a1aa/image/8b1cc47c-674c-43d0-869d-86aeee9d1943.jpg'
+    ],
+    "datePublished": article.publishedAt,
+    "dateModified": article.publishedAt,
+    "author": {
+      "@type": "Organization",
+      "name": article.source.name
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "CRAZY TECH NEWS",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://storage.googleapis.com/a1aa/image/90e72f46-0713-47d1-87f8-ca9149f2c01b.jpg"
+      }
+    },
+    "description": article.description || 'Read the latest tech news article on CRAZY TECH NEWS.'
+  };
+  
+  document.getElementById('structured-data').textContent = JSON.stringify(structuredData);
+  
+  // Display article content
+  const articleContainer = document.getElementById('article-container');
+  articleContainer.innerHTML = `
+    <div class="p-1">
+      <img src="${article.urlToImage || 'https://placehold.co/1200x600/ff0055/000000/png?text=Tech+News'}" 
+           alt="${article.title}" 
+           class="w-full h-64 md:h-96 object-cover">
+    </div>
+    <div class="p-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-pink-400 mb-4">${article.title}</h1>
+      <div class="flex items-center text-gray-400 mb-6">
+        <span class="mr-4"><i class="far fa-calendar mr-2"></i> ${new Date(article.publishedAt).toLocaleDateString()}</span>
+        <span><i class="far fa-newspaper mr-2"></i> ${article.source.name}</span>
+      </div>
+      <div class="article-content text-gray-300">
+        <p>${article.description || 'No description available.'}</p>
+        <p class="mt-6">This is a featured tech news article from CRAZY TECH NEWS. Stay tuned for more updates on this developing story.</p>
+      </div>
+      <div class="mt-8">
+        <a href="index.html#trending" class="inline-block bg-pink-600 hover:bg-pink-700 text-black font-bold uppercase px-8 py-4 rounded-lg shadow-lg transition duration-300 tracking-widest">
+          <i class="fas fa-arrow-left mr-2"></i> Back to Trending Tech
+        </a>
+      </div>
+    </div>
+  `;
+}
   
   const articles = JSON.parse(sessionStorage.getItem('techNewsArticles') || '[]');
   const article = articles[articleId];
